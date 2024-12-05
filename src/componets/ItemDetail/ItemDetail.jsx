@@ -1,43 +1,46 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useCart } from "../../hooks/useCart";
 import ItemCount from "../ItemCount/ItemCount";
-import "./ItemDetail.css";
 
-function ItemDetail({ name, img, description, category, price, stock }) {
-  const [quantity, setQuantity] = useState(0);
-
-  const handleAdd = (cantidad) => {
-    setQuantity(cantidad);
-  };
+function ItemDetail({id, name, img, description, category, price, stock }) {
+  
+  const { addItem, isInCart } = useCart();
+  const handleAdd = (count) => {
+    const productToAdd = {
+      id, name, price, quantity: count
+    }
+    addItem(productToAdd)
+  }
 
   return (
-    <div className="detail-container">
-      <h2 className="detail-title">{name}</h2>
-      <div className="detail-card">
+    <div className="container">
+      <h2>{name}</h2>
+      <div className="card">
         <img
           src={img}
-          className="detail-card-img"
+          style={{ width: 300 }}
+          className="card-img-top"
           alt={name}
         />
-        <div className="detail-card-body">
-          <p className="detail-description">{description}</p>
-          <p className="detail-category">Categoría: {category}</p>
-          <h2 className="detail-price">Precio: $ {price}</h2>
-          <h2 className="detail-stock">Disponible: {stock}</h2>
+        <div className="card-body">
+          <p className="card-text">{description}</p>
+          <p className="card-text">Categoria: {category}</p>
+          <h2 className="card-text">Precio: $ {price}</h2>
+          <h2 className="card-text">Disponible - {stock}</h2>
         </div>
       </div>
 
-      <div className="detail-actions">
-        {quantity === 0 ? (
-          <ItemCount stock={stock} onAdd={handleAdd} />
-        ) : (
-          <Link to="/cart" className="detail-finish-button">
-            Finalizar Compra
-          </Link>
-        )}
-      </div>
+      {
+        isInCart(id) ? (
+          <Link to="/cart">Ir al carrito</Link>
+        ):
+        (
+          <ItemCount stock={stock} onAdd={ handleAdd } />
+        )
+      }
+
     </div>
   );
 }
 
-export default ItemDetail;
+export default ItemDetail

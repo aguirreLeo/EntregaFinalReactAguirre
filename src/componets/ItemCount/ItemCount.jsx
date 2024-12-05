@@ -1,18 +1,14 @@
-import { useState } from "react";
 import "./ItemCount.css";
+import useCounter from "../../hooks/useCount";
 
 function ItemCount({ initialValue = 1, stock, onAdd }) {
-  const [count, setCount] = useState(initialValue);
+  const { increment, decrement, valor: count } = useCounter(initialValue);
 
-  const decrement = () => {
-    if (count > 1) {
-      setCount(count - 1);
-    }
-  };
-
-  const increment = () => {
-    if (count < stock) {
-      setCount(count + 1);
+  const handleAdd = () => {
+    if (count > 0 && count <= stock) {
+      onAdd(count); // Llama a la función proporcionada por el padre
+    } else {
+      alert("Cantidad inválida");
     }
   };
 
@@ -20,16 +16,21 @@ function ItemCount({ initialValue = 1, stock, onAdd }) {
     <div className="count-container">
       <h1 className="count-display">{count}</h1>
       <div className="count-buttons">
-        <button className="count-btn decrement-btn" onClick={decrement}>
+        <button
+          className="count-btn decrement-btn"
+          onClick={decrement}
+          disabled={count <= 1}
+        >
           -
         </button>
-        <button
-          className="count-btn add-to-cart-btn"
-          onClick={() => onAdd(count)}
-        >
+        <button className="count-btn add-to-cart-btn" onClick={handleAdd}>
           Agregar al carrito
         </button>
-        <button className="count-btn increment-btn" onClick={increment}>
+        <button
+          className="count-btn increment-btn"
+          onClick={increment}
+          disabled={count >= stock}
+        >
           +
         </button>
       </div>

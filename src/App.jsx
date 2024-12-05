@@ -4,7 +4,7 @@ import ItemListContainer from './componets/ItemListConteiner/ItemListConteiner';
 import ItemDetailContainer from './componets/ItemDetailContainer/ItemDetailContainer';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.css';
-// import { CartProvider } from './Contexto/CartContext';
+import { CartProvider } from './Contexto/CartContext';
 import Cart from './componets/Cart/Cart';
 import Checkout from './componets/Checkout/Checkout';
 
@@ -13,7 +13,7 @@ import Checkout from './componets/Checkout/Checkout';
 function App() {
   return (
     <BrowserRouter >
-      {/* <CartProvider> */}
+      <CartProvider> 
         <NavBar />
         <Routes>
           <Route
@@ -26,7 +26,7 @@ function App() {
           <Route exact path='/cart' element= {<Cart/>}/>
           <Route exact path='/checkout' element= {<Checkout/>}/>
         </Routes>
-      {/* </CartProvider> */}
+      </CartProvider> 
     </BrowserRouter>
   );
 }
