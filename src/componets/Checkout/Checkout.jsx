@@ -1,3 +1,4 @@
+import "./Checkout.css";
 import { useState } from "react";
 import { useCart } from "../../hooks/useCart";
 import { db } from "../../services/Firebase/config";
@@ -18,6 +19,8 @@ export default function Checkout() {
   const [direccion, setDireccion] = useState("");
 
   const [orderCreated, setOrderCreated] = useState(false);
+  const [orderId, setOrderId] = useState(null);
+  const [error, setError] = useState("");
 
   const { cart, totalQuantity, getTotal, clearCart } = useCart();
   const total = getTotal();
@@ -25,15 +28,18 @@ export default function Checkout() {
   const createOrder = async (e) => {
     e.preventDefault();
 
-    // Depuración
-    console.log("Cantidad total:", totalQuantity);
-    console.log("Total:", total);
-
     if (!totalQuantity || totalQuantity <= 0) {
-      console.error("Error: totalQuantity no es válido.");
+      setError("No hay productos en el carrito.");
       return;
     }
 
+    // Validar que los campos del comprador no estén vacíos
+    if (!nombre || !apellido || !phone || !direccion) {
+      setError("Por favor, complete todos los campos.");
+      return;
+    }
+
+    // Estructura de la orden
     const objOrder = {
       buyer: {
         firstName: nombre,
@@ -47,84 +53,112 @@ export default function Checkout() {
       date: new Date(),
     };
 
+    // Imprimir el objeto objOrder para depuración
+    console.log("Objeto de la orden antes de enviarlo a Firebase:", objOrder);
+
     const ids = cart.map((item) => item.id);
     const productRef = collection(db, "products");
 
-    const productsAddedFromFirestore = await getDocs(
-      query(productRef, where(documentId(), "in", ids))
-    );
+    try {
+      // Obtener productos de Firebase
+      const productsAddedFromFirestore = await getDocs(
+        query(productRef, where(documentId(), "in", ids))
+      );
 
-    const { docs } = productsAddedFromFirestore;
+      const { docs } = productsAddedFromFirestore;
+      const outOfStock = [];
+      const batch = writeBatch(db);
 
-    const outOfStock = [];
-    const batch = writeBatch(db);
+      docs.forEach((doc) => {
+        const dataDoc = doc.data();
+        const stockDb = dataDoc.stock;
 
-    docs.forEach((doc) => {
-      const dataDoc = doc.data();
-      const stockDb = dataDoc.stock;
+        // Encontrar el producto agregado al carrito
+        const productAddedToCart = cart.find((prod) => prod.id === doc.id);
+        const prodQuantity = productAddedToCart.quantity;
 
-      const productAddedToCart = cart.find((prod) => prod.id === doc.id);
-      const prodQuantity = productAddedToCart.quantity;
+        if (stockDb >= prodQuantity) {
+          batch.update(doc.ref, { stock: stockDb - prodQuantity });
+        } else {
+          outOfStock.push({ id: doc.id, ...dataDoc });
+        }
+      });
 
-      if (stockDb >= prodQuantity) {
-        batch.update(doc.ref, { stock: stockDb - prodQuantity });
+      // Si no hay productos fuera de stock, confirmamos la orden
+      if (outOfStock.length === 0) {
+        await batch.commit();
+        const orderRef = collection(db, "orders");
+
+        // Verificar que los datos de la orden son correctos antes de enviarlos
+        if (
+          objOrder.buyer.firstName &&
+          objOrder.buyer.lastName &&
+          objOrder.buyer.phone &&
+          objOrder.buyer.address &&
+          objOrder.items.length > 0
+        ) {
+          const orderAdded = await addDoc(orderRef, objOrder);
+          setOrderId(orderAdded.id);
+          clearCart();
+          setOrderCreated(true);
+        } else {
+          setError("Datos de la orden incompletos.");
+        }
       } else {
-        outOfStock.push({ id: doc.id, ...dataDoc });
+        setError("Algunos productos no están disponibles en el stock.");
       }
-    });
-
-    if (outOfStock.length === 0) {
-      await batch.commit();
-      const orderRef = collection(db, "orders");
-      const orderAdded = await addDoc(orderRef, objOrder);
-      console.log(`El id de su orden es ${orderAdded.id}`);
-      clearCart();
-      setOrderCreated(true);
-    } else {
-      console.log("Hay productos fuera de stock");
+    } catch (error) {
+      console.error("Error al crear la orden:", error);
+      setError("Hubo un error al procesar tu orden.");
     }
   };
 
   if (orderCreated) {
-    return <h1>La orden fue creada correctamente</h1>;
+    return (
+      <div className="order-confirmation">
+        <h1>¡Orden creada exitosamente!</h1>
+        <p>El ID de tu orden es: <strong>{orderId}</strong></p>
+      </div>
+    );
   }
 
   return (
-    <>
+    <div className="checkout-container">
       <h1>Checkout</h1>
-      <form>
+      <form onSubmit={createOrder} className="checkout-form">
         <label>Nombre</label>
         <input
           type="text"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
-        />{" "}
-        <br />
+          required
+        />
         <label>Apellido</label>
         <input
           type="text"
           value={apellido}
           onChange={(e) => setApellido(e.target.value)}
+          required
         />
-        <br />
-        <label>Phone</label>
+        <label>Teléfono</label>
         <input
           type="text"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
+          required
         />
-        <br />
-        <label>Direccion</label>
+        <label>Dirección</label>
         <input
           type="text"
           value={direccion}
           onChange={(e) => setDireccion(e.target.value)}
+          required
         />
-        <br />
-        <button type="submit" className="btn btn-primary" onClick={createOrder}>
+        <button type="submit" className="btn btn-primary">
           Generar Orden
         </button>
       </form>
-    </>
+      {error && <p className="error-message">{error}</p>}
+    </div>
   );
 }

@@ -1,24 +1,31 @@
-import {useCart} from '../../hooks/useCart'
-import './CartItem.css'
-export default function CartItem({id, name, quantity, price}) {
-  const {removeItem} = useCart()
+import { useCart } from "../../hooks/useCart";
+import "./CartItem.css";
+
+export default function CartItem({ id, img, name, quantity, price }) {
+  const { removeItem } = useCart();
 
   const handleRemove = (id) => {
-    removeItem(id)
-  }
+    removeItem(id);
+  };
 
   return (
-    <article className="CardCartItem">
-      <header className="HeaderCartItem">
-        <h2 className="ItemHeaderCartItem">{name}</h2>
+    <article className="cart-item-card">
+      <header className="cart-item-header">
+        <h2 className="cart-item-name">{name}</h2>
       </header>
-      <section className="ContainerItemCartItem">
-        <p className="ItemCartItem">Cantidad: {quantity}</p>
-        <p className="ItemCartItem">Precio x unidad: $ {price}</p>
+      <section className="cart-item-body">
+        <img src={img} alt={name} className="cart-item-img" />
+        <div className="cart-item-details">
+          <p className="cart-item-info">Cantidad: {quantity}</p>
+          <p className="cart-item-info">Precio x unidad: $ {price}</p>
+        </div>
       </section>
-      <footer className="ItemFooterCartItem">
-        <p className="InfoCartItem">Subtotal: $ {price * quantity}</p>
-        <button className="btn btn-primary" onClick={() => handleRemove(id)}>
+      <footer className="cart-item-footer">
+        <p className="cart-item-subtotal">Subtotal: $ {price * quantity}</p>
+        <button
+          className="remove-item-btn"
+          onClick={() => handleRemove(id)}
+        >
           ❌
         </button>
       </footer>

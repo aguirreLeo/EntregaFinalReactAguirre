@@ -13,28 +13,32 @@ function ItemCount({ initialValue = 1, stock, onAdd }) {
   };
 
   return (
-    <div className="count-container">
-      <h1 className="count-display">{count}</h1>
-      <div className="count-buttons">
-        <button
-          className="count-btn decrement-btn"
-          onClick={decrement}
-          disabled={count <= 1}
-        >
-          -
-        </button>
-        <button className="count-btn add-to-cart-btn" onClick={handleAdd}>
-          Agregar al carrito
-        </button>
-        <button
-          className="count-btn increment-btn"
-          onClick={increment}
-          disabled={count >= stock}
-        >
-          +
-        </button>
-      </div>
-    </div>
+    <div className="item-count-container">
+  <h1 className="item-count-display">{count}</h1>
+  <div className="item-count-buttons">
+    <button
+      className="item-count-btn item-decrement-btn"
+      onClick={decrement}
+      disabled={count <= 1}
+    >
+      -
+    </button>
+    <button
+      className="item-count-btn item-add-to-cart-btn"
+      onClick={handleAdd}
+    >
+      Agregar al carrito
+    </button>
+    <button
+      className="item-count-btn item-increment-btn"
+      onClick={increment}
+      disabled={count >= stock}
+    >
+      +
+    </button>
+  </div>
+</div>
+
   );
 }
 

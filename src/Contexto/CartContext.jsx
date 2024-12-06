@@ -12,6 +12,7 @@ export const CartProvider = ({children}) =>{
     }
     
     const addItem = (productToAdd) => {
+      console.log("Producto a agregar:", productToAdd);
       setCart((prevCart) => {
         if (isInCart(productToAdd.id)) {
           return prevCart.map((item) =>
@@ -20,7 +21,13 @@ export const CartProvider = ({children}) =>{
               : item
           );
         } else {
-          return [...prevCart, { ...productToAdd, quantity: productToAdd.quantity }];
+          return [...prevCart, {  id: productToAdd.id,
+                                  name: productToAdd.name,
+                                  price: productToAdd.price,
+                                  img: productToAdd.img, // Incluye la propiedad `img` aquí
+                                  quantity: productToAdd.quantity,
+                                }
+                ];
         }
       });
     };
