@@ -24,7 +24,7 @@ export const CartProvider = ({children}) =>{
           return [...prevCart, {  id: productToAdd.id,
                                   name: productToAdd.name,
                                   price: productToAdd.price,
-                                  img: productToAdd.img, // Incluye la propiedad `img` aquí
+                                  img: productToAdd.img, 
                                   quantity: productToAdd.quantity,
                                 }
                 ];

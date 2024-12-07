@@ -6,7 +6,7 @@ import ItemDetail from "../ItemDetail/ItemDetail.jsx"
 import { doc, getDoc, QuerySnapshot } from "firebase/firestore";
 import { db } from "../../services/Firebase/config.js";
 function ItemDetailContainer() {
-  const [product, setProduct] = useState(null); // Comienza como null hasta que se obtengan los datos
+  const [product, setProduct] = useState(null); 
   const [loader, setLoader] = useState(false);
   const {productId} = useParams();
 
@@ -28,9 +28,8 @@ function ItemDetailContainer() {
       setLoader(false)
     })
     
-  }, [productId]); // Dependencia para ejecutar cada vez que cambie el ID
+  }, [productId]); 
 
-  // Si el producto no se ha cargado, muestra un cargando
   
   if (loader) {
     return <div>Loading...</div>;

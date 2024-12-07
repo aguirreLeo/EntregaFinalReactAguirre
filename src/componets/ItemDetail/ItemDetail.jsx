@@ -9,7 +9,7 @@ function ItemDetail({id, name, img, description, category, price, stock }) {
   const { addItem, isInCart } = useCart();
   const handleAdd = (count) => {
     const productToAdd = {
-      id, name, price, quantity: count
+      id, name, price, quantity: count, img
     }
     addItem(productToAdd)
   }
