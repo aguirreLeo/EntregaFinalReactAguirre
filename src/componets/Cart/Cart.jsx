@@ -18,7 +18,7 @@ export default function Cart() {
       <h1 className="cart-title">Carrito</h1>
       <div className="cart-items">
         {cart.map((item) => {
-          console.log("Item en el carrito:", item); // Verificar el contenido de cada item
+          console.log("Item en el carrito:", item); 
           return <CartItem key={item.id} {...item} />;
         })}
       </div>

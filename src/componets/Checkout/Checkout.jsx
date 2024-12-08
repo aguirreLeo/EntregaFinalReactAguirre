@@ -33,13 +33,11 @@ export default function Checkout() {
       return;
     }
 
-    // Validar que los campos del comprador no estén vacíos
     if (!nombre || !apellido || !phone || !direccion) {
       setError("Por favor, complete todos los campos.");
       return;
     }
 
-    // Estructura de la orden
     const objOrder = {
       buyer: {
         firstName: nombre,
@@ -53,14 +51,12 @@ export default function Checkout() {
       date: new Date(),
     };
 
-    // Imprimir el objeto objOrder para depuración
     console.log("Objeto de la orden antes de enviarlo a Firebase:", objOrder);
 
     const ids = cart.map((item) => item.id);
     const productRef = collection(db, "products");
 
     try {
-      // Obtener productos de Firebase
       const productsAddedFromFirestore = await getDocs(
         query(productRef, where(documentId(), "in", ids))
       );
@@ -73,7 +69,6 @@ export default function Checkout() {
         const dataDoc = doc.data();
         const stockDb = dataDoc.stock;
 
-        // Encontrar el producto agregado al carrito
         const productAddedToCart = cart.find((prod) => prod.id === doc.id);
         const prodQuantity = productAddedToCart.quantity;
 
@@ -84,12 +79,11 @@ export default function Checkout() {
         }
       });
 
-      // Si no hay productos fuera de stock, confirmamos la orden
+      
       if (outOfStock.length === 0) {
         await batch.commit();
         const orderRef = collection(db, "orders");
 
-        // Verificar que los datos de la orden son correctos antes de enviarlos
         if (
           objOrder.buyer.firstName &&
           objOrder.buyer.lastName &&

@@ -6,7 +6,7 @@ function ItemCount({ initialValue = 1, stock, onAdd }) {
 
   const handleAdd = () => {
     if (count > 0 && count <= stock) {
-      onAdd(count); // Llama a la función proporcionada por el padre
+      onAdd(count); 
     } else {
       alert("Cantidad inválida");
     }
